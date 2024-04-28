@@ -1,0 +1,9 @@
+@tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+  
+
+@font-face {
+    font-family: 'Monument-Reg';
+    src: url('./assets/PPMonumentExtended-Regular.otf') format('opentype')
+}
