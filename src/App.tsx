@@ -22,7 +22,7 @@ function App() {
   const secondsPerBeat = 60 / tempo
   const secondsPerQuarter = secondsPerBeat / 4
   // const secondsPerBar = secondsPerBeat * 4
-  const [sequencerCollection, setSequencerCollection] = useState<Array<Array<boolean>>>(Array(4).fill(0).map(() => Array(16).fill(false)));
+  const [sequencerCollection, setSequencerCollection] = useState<Array<Array<boolean>>>(Array(4).fill(0).map((_, outerindex) => Array(16).fill(false).map((_, index) => (outerindex == 0 ? index % 4 == 0 ? true : false : false))));
   const [sequencerPlayState, setSequencerPlayState] = useState(0)
   const [volumes, setVolumes] = useState<Array<number>>(new Array(4).fill(50))
   const [isPlaying, setIsPlaying] = useState(false)
@@ -31,6 +31,15 @@ function App() {
   const timeUISetter = useRef<NodeJS.Timeout | null>(null);
   const playHandler = useRef<NodeJS.Timeout | null>(null);
 
+  useEffect(() => {
+    setSequencerCollection((prev) => {
+      prev[0][0] = true;
+      prev[0][4] = true;
+      prev[0][8] = true;
+      prev[0][12] = true;
+      return prev
+    })}, [])
+    
   useEffect(() => {
     if (tempoChanger.current) {
       clearTimeout(tempoChanger.current)
@@ -119,6 +128,7 @@ function App() {
   function stopPlaying() {
     if (timeUISetter.current) {
       clearTimeout(timeUISetter.current)
+      setSequencerPlayState(0)
     }
     playingSources.current.forEach((source) => {
       source.stop();
@@ -145,8 +155,8 @@ function App() {
     stopPlaying()
   }
   return (
-    <div className='flex flex-col justify-start items-center h-screen w-screen gap-10 font-monument bg-slate-300'>
-      <h1 className='text-4xl font-semibold my-10'>DRUM SEQUENCER</h1>
+    <div className='flex flex-col justify-start min-h-screen items-center w-screen gap-5 font-monument bg-slate-300'>
+      <h1 className='text-4xl font-semibold my-5'>DRUM SEQUENCER</h1>
       <div className='w-3/4 flex flex-row justify-center gap-3'>
         <div className='flex flex-col gap-1'>
           <p>BPM</p>
@@ -158,14 +168,13 @@ function App() {
       <Sequencer sequencerCollection={sequencerCollection} setSequencerCollection={setSequencerCollection} volumes={volumes} setVolumes={setVolumes} />
       <div className='w-7/12 border-t-2 border-black'></div>
       <TimeUI sequencerPlayState={sequencerPlayState} />
-      <div className='flex flex-row gap-3'>
+      <div className='flex flex-row gap-3 bg-slate-500 p-5 rounded-xl'>
         <a onClick={togglePlay} className={`text-4xl cursor-pointer p-5 rounded-full ${isPlaying ? "bg-red-300" : "bg-green-300"}`}>{isPlaying ? <FaStop /> : <FaPlay />}</a>
-        <a onClick={resetArray} className='font-semibold text-2xl cursor-pointer p-5 rounded-full bg-slate-300'>Reset</a>
+        <a onClick={resetArray} className='font-semibold text-2xl cursor-pointer p-5 rounded-full bg-red-500'>Reset</a>
       </div>
-      \
+      
       
       <div className='w-full border-black'>
-
       </div>
 
     </div>
